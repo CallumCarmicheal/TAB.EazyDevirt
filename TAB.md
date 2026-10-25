@@ -17,8 +17,9 @@ dotnet run --project src/EazyDevirt/EazyDevirt.csproj -- \
 ```
 
 `--tab-analyze-only` exercises the current devirtualization pipeline in memory,
-but **does not write** a PE. When discovery fails it exits nonzero (including
-when `--save-anyway` is also supplied). The CLI no longer waits for Enter on
+but **does not write** a PE. When discovery fails, zero VM methods are discovered, or even one discovered
+method fails to devirtualize, it exits nonzero (including when `--save-anyway`
+is also supplied). Stage success alone is not evidence of complete VM recovery. The CLI no longer waits for Enter on
 completion and now uses `Path.Combine` to construct cross-platform output paths.
 
 Devirtualization is not a substitute for TAB's single final PE writer, nor

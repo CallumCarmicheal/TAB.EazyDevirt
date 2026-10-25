@@ -37,10 +37,23 @@ internal static class Program
             }
         }
 
-        // The TAB patcher owns the final PE write; analyze without emission.
+        // TAB analysis is a strict completeness gate, not merely a successful
+        // traversal of the pipeline. Upstream's MethodDevirtualizer.Run() can
+        // return true after individual VM methods failed to recover.
+        // In this mode we must never report a partial result as usable.
         if (options.TabAnalyzeOnly)
         {
-            ctx.Console.Success("TAB analysis complete; no assembly was written.");
+            var discovered = ctx.VMMethods?.Count ?? 0;
+            var recovered = ctx.VMMethods?.Count(method => method.SuccessfullyDevirtualized) ?? 0;
+            ctx.Console.Info($"TAB VM analysis: {discovered} discovered, {recovered} recovered.");
+            if (discovered == 0 || recovered != discovered)
+            {
+                ctx.Console.Error("TAB VM analysis incomplete; no assembly was written.");
+                Environment.ExitCode = 1;
+                return;
+            }
+
+            ctx.Console.Success("TAB VM analysis complete; no assembly was written.");
             return;
         }
 
