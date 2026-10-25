@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "TAB.EazyDevirt",
+  "license": "GPL-3.0-only",
+  "role": "optional-vm-analysis",
+  "buildProject": "src/EazyDevirt/EazyDevirt.csproj",
+  "tabSolutionFilter": "TAB.core.slnf",
+  "shipsInsideGame": false,
+  "hasCommandLineInterface": true,
+  "safeAnalysisArguments": [
+    "{input}",
+    "--tab-analyze-only",
+    "--preserve-all"
+  ],
+  "preserveFullUpstreamHistory": true,
+  "integrationNote": "Optional; only use when VM protection is independently detected"
+}

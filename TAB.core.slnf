@@ -1,0 +1,13 @@
+{
+  "solution": {
+    "path": "EazyDevirt.sln",
+    "projects": [
+      "src/EazyDevirt/EazyDevirt.csproj",
+      "deps/Echo/src/Core/Echo/Echo.csproj",
+      "deps/Echo/src/Core/Echo.Ast/Echo.Ast.csproj",
+      "deps/Echo/src/Core/Echo.ControlFlow/Echo.ControlFlow.csproj",
+      "deps/Echo/src/Core/Echo.DataFlow/Echo.DataFlow.csproj",
+      "deps/Echo/src/Platforms/Echo.Platforms.AsmResolver/Echo.Platforms.AsmResolver.csproj"
+    ]
+  }
+}
