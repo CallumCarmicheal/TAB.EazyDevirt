@@ -1,4 +1,4 @@
-﻿namespace EazyDevirt.Devirtualization.Options;
+namespace EazyDevirt.Devirtualization.Options;
 
 internal record DevirtualizationOptions
 {
@@ -53,6 +53,9 @@ internal record DevirtualizationOptions
  /// Save output even if devirtualization fails
  /// </summary>
  public bool SaveAnyway { get; init; }
+
+ /// <summary>Run analysis but never write a PE/assembly to disk.</summary>
+ public bool TabAnalyzeOnly { get; init; }
  
  /// <summary>
  /// Only save successfully devirtualized methods

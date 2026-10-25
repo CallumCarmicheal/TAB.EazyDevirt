@@ -1,4 +1,4 @@
-﻿using System.CommandLine;
+using System.CommandLine;
 using System.CommandLine.Binding;
 
 namespace EazyDevirt.Devirtualization.Options;
@@ -14,10 +14,11 @@ internal class DevirtualizationOptionsBinder : BinderBase<DevirtualizationOption
     private readonly Option<bool> _saveAnywayOption;
     private readonly Option<bool> _onlySaveDevirtedOption;
     private readonly Option<bool> _requireDepsForGenericMethods;
+    private readonly Option<bool> _tabAnalyzeOption;
 
     public DevirtualizationOptionsBinder(Argument<FileInfo> assemblyArgument, Argument<DirectoryInfo> outputPathArgument, 
         Option<int> verbosityOption, Option<bool> preserveAllOption, Option<bool> noVerifyOption, Option<bool> keepTypesOption, Option<bool> saveAnywayOption,
-        Option<bool> onlySaveDevirtedOption, Option<bool> requireDepsForGenericMethods)
+        Option<bool> onlySaveDevirtedOption, Option<bool> requireDepsForGenericMethods, Option<bool> tabAnalyzeOption)
     {
         _assemblyArgument = assemblyArgument;
         _outputPathArgument = outputPathArgument;
@@ -28,6 +29,7 @@ internal class DevirtualizationOptionsBinder : BinderBase<DevirtualizationOption
         _saveAnywayOption = saveAnywayOption;
         _onlySaveDevirtedOption = onlySaveDevirtedOption;
         _requireDepsForGenericMethods = requireDepsForGenericMethods;
+        _tabAnalyzeOption = tabAnalyzeOption;
     }
 
     protected override DevirtualizationOptions GetBoundValue(BindingContext bindingContext) =>
@@ -41,6 +43,7 @@ internal class DevirtualizationOptionsBinder : BinderBase<DevirtualizationOption
             KeepTypes = bindingContext.ParseResult.GetValueForOption(_keepTypesOption),
             SaveAnyway = bindingContext.ParseResult.GetValueForOption(_saveAnywayOption),
             OnlySaveDevirted = bindingContext.ParseResult.GetValueForOption(_onlySaveDevirtedOption),
-            RequireDepsForGenericMethods = bindingContext.ParseResult.GetValueForOption(_requireDepsForGenericMethods)
+            RequireDepsForGenericMethods = bindingContext.ParseResult.GetValueForOption(_requireDepsForGenericMethods),
+            TabAnalyzeOnly = bindingContext.ParseResult.GetValueForOption(_tabAnalyzeOption)
         };
 }

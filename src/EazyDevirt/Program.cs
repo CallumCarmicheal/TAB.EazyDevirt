@@ -13,13 +13,11 @@ internal static class Program
     private static readonly Version CurrentVersion = new("1.0.0");
     private static readonly Version CurrentEazVersion = new("2022.2.763.35371");
 
-    private static async Task Main(params string[] args)
+    private static async Task<int> Main(params string[] args)
     {
-        var parser = BuildParser();
-
-        await parser.InvokeAsync(args).ConfigureAwait(false);
-
-        Console.ReadLine();
+        // CLI must terminate deterministically in unattended TAB builds.
+        var result = await BuildParser().InvokeAsync(args).ConfigureAwait(false);
+        return result != 0 ? result : Environment.ExitCode;
     }
 
     private static void Run(DevirtualizationOptions options)
@@ -32,13 +30,24 @@ internal static class Program
         if (!devirtualizer.Run())
         {
             ctx.Console.Error("Failed to devirtualize executable!");
-            if (!options.SaveAnyway)
+            if (!options.SaveAnyway || options.TabAnalyzeOnly)
+            {
+                Environment.ExitCode = 1;
                 return;
+            }
+        }
+
+        // The TAB patcher owns the final PE write; analyze without emission.
+        if (options.TabAnalyzeOnly)
+        {
+            ctx.Console.Success("TAB analysis complete; no assembly was written.");
+            return;
         }
 
         ctx.Options.OutputPath.Create();
-        var outputFilePath = ctx.Options.OutputPath.FullName + '\\' + Path.GetFileNameWithoutExtension(ctx.Options.Assembly.Name) +
-                             "-devirt" + ctx.Options.Assembly.Extension;
+        var outputFilePath = Path.Combine(ctx.Options.OutputPath.FullName,
+            Path.GetFileNameWithoutExtension(ctx.Options.Assembly.Name) +
+            "-devirt" + ctx.Options.Assembly.Extension);
 
         var dnFactory =
             new DotNetDirectoryFactory(ctx.Options.PreserveAll
@@ -84,6 +93,8 @@ internal static class Program
         var keepTypesOption = new Option<bool>(new[] { "--keep-types", "-kt"}, "Keeps obfuscator types");
         keepTypesOption.SetDefaultValue(false);
         
+        var tabAnalyzeOption = new Option<bool>("--tab-analyze-only", "Run devirtualization analysis without writing an assembly");
+
         var saveAnywayOption = new Option<bool>(new[] { "--save-anyway"}, "Saves output of devirtualizer even if it fails");
         saveAnywayOption.SetDefaultValue(false);
         
@@ -105,13 +116,14 @@ internal static class Program
             keepTypesOption,
             saveAnywayOption,
             onlySaveDevirtedOption,
-            requireDepsForGenerics
+            requireDepsForGenerics,
+            tabAnalyzeOption
         };
 
         rootCommand.SetHandler(Run,
             new DevirtualizationOptionsBinder(inputArgument, outputArgument, verbosityOption,
                 preserveAllOption, noVerifyOption, keepTypesOption, saveAnywayOption, onlySaveDevirtedOption,
-                requireDepsForGenerics));
+                requireDepsForGenerics, tabAnalyzeOption));
         
         return new CommandLineBuilder(rootCommand)
             .UseDefaults()
